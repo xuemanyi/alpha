@@ -1,11 +1,6 @@
-#include <linux/types.h>
-#include <linux/kernel.h>
-#include <linux/delay.h>
-#include <linux/ide.h>
-#include <linux/init.h>
-#include <linux/module.h>
+#include "drv.h"
 
-#define CHRDEVBASE_MAJIR 200
+#define CHRDEVBASE_MAJOR 200
 #define CHRDEVBASE_NAME  "chrdevbase"
 
 static char read_buf[128];
@@ -14,29 +9,30 @@ static char kernel_data[] = {"kernel data"};
 
 static int chrdevbase_open(struct inode *inode, struct file *filp)
 {
-    printk("open chrdebase \r\n");
+    // printk("open chrdebase \r\n");
+    printk(KERN_INFO "open chrdevbase\n"); // kern info level should set
 
     return 0;
 }
 
-static ssize_t chrdevbase_read(struct file *filp, char __usr *buf, size_t cnt,
-    loff_t *offt)
+static ssize_t chrdevbase_read(struct file *filp, char __user *buf, size_t cnt, loff_t *offt)
 {
     int ret = 0;
 
     memcpy(read_buf, kernel_data, sizeof(kernel_data));
     
     ret = copy_to_user(buf, read_buf, cnt);
-    if (ret == 0)
-    {
-        printk("send data to user successed\n");
+    if (ret == 0) {
+        printk("send data to user succeeded\n");
+        return cnt;
     }
-    else
-    {
-        printk("send data to user failed\n");
+    else {
+        printk("send data to user failed, %d bytes could not be copied\n", ret);
+        return -EFAULT;
     }
 
-    return 0;
+    // return 0;
+    return cnt; // read and write shoule return cnt, not 0
 }
 
 static ssize_t chrdevbase_write(struct file *filp, const char __user *buf, 
@@ -45,16 +41,17 @@ static ssize_t chrdevbase_write(struct file *filp, const char __user *buf,
     int ret = 0;
 
     ret = copy_from_user(write_buf, buf, cnt);
-    if (ret == 0)
-    {
-        printk("write data to user successed\n");
+    if (ret == 0) {
+        printk("recv data to user succeeded\n");
+        return cnt;
     }
-    else
-    {
-        printk("write data to user failed\n");
+    else {
+        printk("recv data to user failed, %d bytes could not be copied\n", ret);
+        return -EFAULT;
     }
 
     return 0;
+    return cnt;
 }
 
 static int chrdevbase_release(struct inode *inode, struct file *filp)
@@ -89,7 +86,7 @@ static void __exit chrdevbase_exit(void)
 {
     unregister_chrdev(CHRDEVBASE_MAJIR, CHRDEVBASE_NAME);
 
-    printf("chrdevbase_exit()\n");
+    printk("chrdevbase_exit()\n");
 }
 
 module_init(chrdevbase_init);
