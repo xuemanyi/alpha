@@ -1,4 +1,4 @@
-#include "drv.h"
+#include "../drv.h"
 
 #define CHRDEVBASE_MAJOR 200
 #define CHRDEVBASE_NAME  "chrdevbase"
@@ -9,53 +9,43 @@ static char kernel_data[] = {"kernel data"};
 
 static int chrdevbase_open(struct inode *inode, struct file *filp)
 {
-    // printk("open chrdebase \r\n");
-    printk(KERN_INFO "open chrdevbase\n"); // kern info level should set
-
+    printk(KERN_INFO "open chrdevbase\n");
     return 0;
 }
 
-static ssize_t chrdevbase_read(struct file *filp, char __user *buf, size_t cnt, loff_t *offt)
+static ssize_t chrdevbase_read(struct file *filp, char __user *buf, size_t cnt, loff_t *ppos)
 {
-    int ret = 0;
+    int ret;
 
     memcpy(read_buf, kernel_data, sizeof(kernel_data));
-    
+
     ret = copy_to_user(buf, read_buf, cnt);
     if (ret == 0) {
-        printk("send data to user succeeded\n");
+        printk(KERN_INFO "send data to user succeeded\n");
         return cnt;
-    }
-    else {
-        printk("send data to user failed, %d bytes could not be copied\n", ret);
+    } else {
+        printk(KERN_ERR "send data to user failed, %d bytes could not be copied\n", ret);
         return -EFAULT;
     }
-
-    // return 0;
-    return cnt; // read and write shoule return cnt, not 0
 }
 
-static ssize_t chrdevbase_write(struct file *filp, const char __user *buf, 
-    size_t cnt, loff_t offt)
+static ssize_t chrdevbase_write(struct file *filp, const char __user *buf, size_t cnt, loff_t *ppos)
 {
-    int ret = 0;
+    int ret;
 
     ret = copy_from_user(write_buf, buf, cnt);
     if (ret == 0) {
-        printk("recv data to user succeeded\n");
+        printk(KERN_INFO "write data from user succeeded\n");
         return cnt;
-    }
-    else {
-        printk("recv data to user failed, %d bytes could not be copied\n", ret);
+    } else {
+        printk(KERN_ERR "write data from user failed, %d bytes could not be copied\n", ret);
         return -EFAULT;
     }
-
-    return 0;
-    return cnt;
 }
 
 static int chrdevbase_release(struct inode *inode, struct file *filp)
 {
+    printk(KERN_INFO "release chrdevbase\n");
     return 0;
 }
 
@@ -67,26 +57,24 @@ static struct file_operations chrdevbase_fops = {
     .release = chrdevbase_release,
 };
 
-static int __init  chrdevbase_init(void)
+static int __init chrdevbase_init(void)
 {
-    int ret = 0;
+    int ret;
 
-    ret = register_chrdev(CHRDEVBASE_MAJIR, CHRDEVBASE_NAME, &chrdevbase_fops);
-    if (ret < 0)
-    {
-        printk("chrdevbase driver register failed\n");
+    ret = register_chrdev(CHRDEVBASE_MAJOR, CHRDEVBASE_NAME, &chrdevbase_fops);
+    if (ret < 0) {
+        printk(KERN_ERR "chrdevbase driver register failed\n");
+        return ret;
     }
 
-    printk("chrdevbase_init()\n");
-
+    printk(KERN_INFO "chrdevbase_init()\n");
     return 0;
 }
 
 static void __exit chrdevbase_exit(void)
 {
-    unregister_chrdev(CHRDEVBASE_MAJIR, CHRDEVBASE_NAME);
-
-    printk("chrdevbase_exit()\n");
+    unregister_chrdev(CHRDEVBASE_MAJOR, CHRDEVBASE_NAME);
+    printk(KERN_INFO "chrdevbase_exit()\n");
 }
 
 module_init(chrdevbase_init);

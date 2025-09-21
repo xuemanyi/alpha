@@ -6,6 +6,11 @@
 *.elf
 *.bin
 *.dis
+*.ko
+*.app
+*.mod.c
+*.order
+*.symvers
 
 # vscode
 .vscode/
