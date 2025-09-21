@@ -1,2 +1,30 @@
-#dir
+# dir
 00_tools
+
+# files
+*.o
+*.elf
+*.bin
+*.dis
+
+# vscode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# log
+*.log
+logs/
+*.logs
+
+# doc
+*.pdf
+*.doc
+*.docx
+
+*.zip
+*.tar.gz
+*.rar
+
