@@ -7,10 +7,10 @@
 *.bin
 *.dis
 *.ko
-*.app
 *.mod.c
 *.order
 *.symvers
+app
 
 # vscode
 .vscode/
