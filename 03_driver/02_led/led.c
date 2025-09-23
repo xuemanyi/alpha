@@ -1,4 +1,4 @@
-#include "drv.h"
+#include "../drv.h"
 
 #define LED_MAJOR 200
 #define LED_NAME  "led"
@@ -24,7 +24,7 @@ void led_switch(u8 sta)
 {
     u32 val = 0;
 
-    if (sta = LED_ON) {
+    if (sta == LED_ON) {
         val = readl(GPIO1_DR);
         val &= ~(1 << 3);
         writel(val, GPIO1_DR);
@@ -57,13 +57,15 @@ static ssize_t led_write(struct file *filp, const char __user *buf, size_t cnt, 
         return -EFAULT;
     }
 
-    ledstat = datavyf[0];
+    ledstat = databuf[0];
 
     if (ledstat == LED_ON) {
         led_switch(LED_ON);
-    } else if (led_stat == LED_OFF) {
+    } else if (ledstat == LED_OFF) {
         led_switch(LED_OFF);
     }
+
+    return 0;
 }
 
 static int led_release(struct inode *inode, struct file *filp)
@@ -109,7 +111,7 @@ static int __init led_init(void)
 
     ret = register_chrdev(LED_MAJOR, LED_NAME, &led_fops);
     if (ret < 0) {
-        printk(KERN_INFO, "register chrdev failed\n");
+        printk(KERN_INFO "register chrdev failed\n");
         return -EIO;
     }
 
@@ -124,7 +126,7 @@ static void __exit led_exit(void)
     iounmap(GPIO1_DR);
     iounmap(GPIO1_GDIR);
 
-    unregister_chrdev(led_MAJOR, LED_NAME);
+    unregister_chrdev(LED_MAJOR, LED_NAME);
     
     printk("remod led");
 }
