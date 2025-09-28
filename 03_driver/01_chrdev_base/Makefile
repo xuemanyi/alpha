@@ -13,8 +13,7 @@ kernel_modules:
 	@mkdir -p $(BUILD_DIR)
 	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) modules
 	@echo "Copying build results to $(BUILD_DIR)"
-	@cp *.ko *.mod.* *.o Module.symvers modules.order $(BUILD_DIR)/ 2>/dev/null || true
-	@rm -f *.ko *.mod.* *.o Module.symvers modules.order 2>/dev/null || true
+	@mv *.ko *.mod.* *.o Module.symvers modules.order $(BUILD_DIR)/ 2>/dev/null || true
 # $(MAKE) -C $(KERNELDIR) 表示切换到内核源码目录执行 make
 # M=$(CURRENT_PATH)       指定当前模块的源码路径，内核构建系统会进入这个目录编译模块
 # modules                 指定目标，表示只编译模块（不编译整个内核）
