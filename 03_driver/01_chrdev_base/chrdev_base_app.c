@@ -6,7 +6,7 @@ int main(int argc, char const *argv[])
 {
     int fd = 0;
     int ret = 0;
-    char *filename = NULL;
+    const char *filename = NULL;
     char readbuf[128] = {0};
     char writebuf[128] = {0};
     
@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
         if (ret < 0) {
             printf("read file %s failed\n", filename);
         } else {
-            printf("read data: %s\n", readbuf)
+            printf("read data: %s\n", readbuf);
         }
     }
 

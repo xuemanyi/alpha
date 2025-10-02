@@ -1,4 +1,4 @@
-#include "../include/app.h"
+#include "app.h"
 
 #define LED_OFF 0
 #define LED_ON  1
@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
 {
     int fd = 0;
     int ret = 0;
-    char *filename = NULL;
+    const char *filename = NULL;
     unsigned char databuf[1] = {0};
     
     if (argc != 3) {

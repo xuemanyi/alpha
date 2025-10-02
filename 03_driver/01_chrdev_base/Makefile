@@ -24,6 +24,19 @@ release: all
 $(BUILD_DIR):
 	@mkdir -p $@
 
+CC = $(CROSS_COMPILE)gcc
+INCLUDE_PATH = -I"$(CURRENT_PATH)/../include"
+APP_SRC_DIR = .
+APP_SOURCES = $(wildcard $(APP_SRC_DIR)/*_app.c)
+TARGET_APP = $(BUILD_DIR)/app
+
+app: $(TARGET_APP)
+
+$(TARGET_APP): $(APP_SOURCES) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(INCLUDE_PATH) $^ -o $@
+
+delete:
+	@rm -f $(BUILD_DIR)/app
 clean:
 	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) clean
 	@rm -rf $(BUILD_DIR)
