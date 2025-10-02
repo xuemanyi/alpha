@@ -1,23 +1,29 @@
-KERNELDIR := /home/sucre/01_alpha/02_linux_system/02_kernel
+KERNELDIR ?= /home/sucre/01_alpha/02_linux_system/02_kernel
 CURRENT_PATH := $(shell pwd)
-BUILD_DIR := $(CURRENT_PATH)/build
+ARCH ?= arm
+CROSS_COMPILE ?= arm-linux-gnueabihf-
 
-ARCH=arm 
-CROSS_COMPILE=arm-linux-gnueabihf-
+MODULE_NAME := chrdev_base
+obj-m := $(MODULE_NAME).o
 
-obj-m := chrdev_base.o
+BUILD_DIR ?= $(CURRENT_PATH)/build
 
-build: kernel_modules
+ccflags-y := -I$(KERNELDIR)/../../03_driver/include -Wall
 
-kernel_modules:
-	@mkdir -p $(BUILD_DIR)
-	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) modules
-	@echo "Copying build results to $(BUILD_DIR)"
-	@mv *.ko *.mod.* *.o Module.symvers modules.order $(BUILD_DIR)/ 2>/dev/null || true
-# $(MAKE) -C $(KERNELDIR) 表示切换到内核源码目录执行 make
-# M=$(CURRENT_PATH)       指定当前模块的源码路径，内核构建系统会进入这个目录编译模块
-# modules                 指定目标，表示只编译模块（不编译整个内核）
+all: | $(BUILD_DIR)
+	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) \
+		ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) modules
+	@mv -f *.ko *.o *.mod.* Module.symvers modules.order .*.cmd .tmp_versions $(BUILD_DIR)/ 2>/dev/null || true
+
+debug: ccflags-y += -g -DDEBUG -O0
+debug: all
+
+release: ccflags-y += -O2 -DNDEBUG
+release: all
+
+$(BUILD_DIR):
+	@mkdir -p $@
 
 clean:
 	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) clean
-	rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)

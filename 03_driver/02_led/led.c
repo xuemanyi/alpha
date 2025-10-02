@@ -1,4 +1,4 @@
-#include "../drv.h"
+#include "drv.h"
 
 #define LED_MAJOR 200
 #define LED_NAME  "led"

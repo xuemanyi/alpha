@@ -1,4 +1,4 @@
-#include "../drv.h"
+#include "drv.h"
 
 #define NEW_CHR_LED_CNT  1
 #define NEW_CHR_LED_NAME "newchrled"

@@ -1,0 +1,42 @@
+KERNELDIR ?= /home/sucre/01_alpha/02_linux_system/02_kernel
+CURRENT_PATH := $(shell pwd)
+ARCH ?= arm
+CROSS_COMPILE ?= arm-linux-gnueabihf-
+
+MODULE_NAME := chrdev_base
+obj-m := $(MODULE_NAME).o
+
+BUILD_DIR ?= $(CURRENT_PATH)/build
+
+INCLUDE_DIR ?= $(CURRENT_PATH)/../include
+EXTRA_CFLAGS ?= -I$(INCLUDE_DIR) -Wall
+
+all: | $(BUILD_DIR)
+	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) \
+		ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) \
+		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" modules
+	@mv -f *.ko *.o *.mod.* Module.symvers modules.order .*.cmd $(BUILD_DIR)/ 2>/dev/null || true
+
+debug: EXTRA_CFLAGS += -g -DDEBUG -O0
+debug: all
+
+release: EXTRA_CFLAGS += -O2 -DNDEBUG
+release: all
+
+$(BUILD_DIR):
+	@mkdir -p $@
+
+clean:
+	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) clean
+	@rm -rf $(BUILD_DIR)
+
+INSTALL_DIR ?= /lib/modules/$(shell uname -r)/extra
+
+install: all
+	sudo mkdir -p $(INSTALL_DIR)
+	sudo cp $(BUILD_DIR)/$(MODULE_NAME).ko $(INSTALL_DIR)/
+	sudo depmod -a
+
+uninstall:
+	sudo rm -f $(INSTALL_DIR)/$(MODULE_NAME).ko
+	sudo depmod -a

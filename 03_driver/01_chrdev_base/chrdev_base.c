@@ -1,4 +1,4 @@
-#include "../drv.h"
+#include "drv.h"
 
 #define CHRDEVBASE_MAJOR 200
 #define CHRDEVBASE_NAME  "chrdevbase"
