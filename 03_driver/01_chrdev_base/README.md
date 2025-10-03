@@ -1,3 +1,7 @@
+- [字符驱动](#字符驱动)
+  - [1.Makefile](#1makefile)
+  - [2.源代码中的问题](#2源代码中的问题)
+    - [2.1 未指定const导致的常量性丢失-app](#21-未指定const导致的常量性丢失-app)
 # 字符驱动
 ## 1.Makefile
 1. 检查头文件路径  
@@ -6,9 +10,9 @@
 2. 在编译命令中添加自定义的头文件路径  
     `@$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" modules`
 3. __直接在`Makefile`文件中添加`EXTRA_CFLAGS="$(EXTRA_CFLAGS)`没在make命令中添加，执行`make`命令回报错找不到头文件__
-    - 命令行 EXTRA_CFLAGS → 生效，因为作为环境变量传入了内核顶层 Makefile
-    - 模块 Makefile 里 EXTRA_CFLAGS → 可能被忽略，新内核不推荐这么写
-    - 正确写法：在模块 Makefile 里用 ccflags-y := -I$(INCLUDE_DIR)  
+    - 命令行`EXTRA_CFLAGS` → 生效，因为作为环境变量传入了内核顶层`Makefile`
+    - 模块`Makefile`里`EXTRA_CFLAGS` → 可能被忽略，新内核不推荐这么写
+    - 正确写法：在模块`Makefile`里用`ccflags-y := -I$(INCLUDE_DIR)` 
     
     Kbuild 的执行流程：当在模块目录下写 obj-m := xxx.o，然后调用：`make -C $(KERNELDIR) M=$(PWD) modules`  
     编译流程分两步：
@@ -69,13 +73,13 @@
         | 堆段        | 动态分配（可写）     | 
 
 2. 源代码
-    ```
+    ```c
     int main(int argc, char const *argv[])  
     // argv 被声明为 const char *argv[]，即 argv[1] 是 const char*
     {
         char *filename = NULL;  // filename 是 char* (非常量)
         // ...
-        filename = argv[1];     // 这里警告：将 const char* 赋值给 char*        ↑
+        filename = argv[1];     // 这里警告：将 const char* 赋值给 char*
         // argv[1] 是 const char*，但 filename 是 char*
     }
     ```
