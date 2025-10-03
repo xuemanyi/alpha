@@ -40,3 +40,47 @@
         - 没有`|`
             1. 每次运行：都会检查`build`目录的时间戳
             2. 如果`build`目录的时间戳比`all`新，会重新执行`all`（即使源码没变化）
+## 2.源代码中的问题
+### 2.1 未指定const导致的常量性丢失-app
+1. 警告信息
+    ```
+    arm-linux-gnueabihf-gcc -I../include chrdev_base_app.c -o app
+    chrdev_base_app.c: 在函数‘main’中:
+    chrdev_base_app.c:18:14: 警告： assignment discards ‘const’ qualifier from pointer target type
+    filename = argv[1];
+    ```
+    
+    - 这个警告是因为类型不匹配导致的常量性丢失：`main`函数的`argv`参数被声明为`const char*[]`类型，表示命令行参数字符串  
+    不应被修改；而`filename`变量是`char*`类型，表示可通过它修改字符串内容。将`argv[1]`赋值给`filename`相当于丢弃了  
+    `const`限定符，编译器警告这种操作可能存在风险——如果原始字符串存储在只读内存中，后续通过`filename`修改内容会导致程序崩溃
+    
+    - 合法的赋值方向：  
+    `char*       → const char*    ✓ 安全（添加const）`  
+    `const char* → char*          ✗ 危险（丢弃const）`
+
+    - 程序启动时的典型布局：  
+        
+        | 内存区域     | 内容                 |
+        |-------------|---------------------|
+        | 代码段      | 程序指令（只读）     |
+        | 只读数据段  | 字符串常量（只读）   |
+        | 数据段      | 全局变量（可写）     |
+        | 栈段        | 局部变量（可写）     |
+        | 堆段        | 动态分配（可写）     | 
+
+2. 源代码
+    ```
+    int main(int argc, char const *argv[])  
+    // argv 被声明为 const char *argv[]，即 argv[1] 是 const char*
+    {
+        char *filename = NULL;  // filename 是 char* (非常量)
+        // ...
+        filename = argv[1];     // 这里警告：将 const char* 赋值给 char*        ↑
+        // argv[1] 是 const char*，但 filename 是 char*
+    }
+    ```
+3. 解决方法
+    - 移除main定义中不必要的const
+    - 如果需要保持`const`，使用类型转换，给`filename`添加类型转换
+    - 直接使用`argv[1]`，不额外声明变量
+
