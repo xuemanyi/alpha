@@ -202,6 +202,16 @@
 			0X0209C000 0X04 	/* GPIO1_DR_BASE */
 			0X0209C004 0X04 >;	/* GPIO1_GDIR_BASE */
 	};
+
+	gpioled {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "atkalpha-gpioled";
+		pinctrl-name = "default";
+		pinctrl-0 = <&pinctrl_led>;
+		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
 };
 
 &cpu0 {
@@ -571,10 +581,11 @@
 
 		pinctrl_tsc: tscgrp {
 			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO01__GPIO1_IO01	0xb0
-				MX6UL_PAD_GPIO1_IO02__GPIO1_IO02	0xb0
-				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0xb0
-				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04	0xb0
+				/* 这个节点教程未使用，与LED IO冲突，屏蔽 */
+				/* MX6UL_PAD_GPIO1_IO01__GPIO1_IO01	0xb0 */
+				/* MX6UL_PAD_GPIO1_IO02__GPIO1_IO02	0xb0 */
+				/* MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0xb0 */
+				/* MX6UL_PAD_GPIO1_IO04__GPIO1_IO04	0xb0 */
 			>;
 		};
 
@@ -702,6 +713,12 @@
 		pinctrl_wdog: wdoggrp {
 			fsl,pins = <
 				MX6UL_PAD_LCD_RESET__WDOG1_WDOG_ANY    0x30b0
+			>;
+		};
+
+		pinctrl_led: ledgrp {
+			fsl,pins = <
+			MX6UL_PAD_GPIO1_IO03__GPIO1_IO03 0x10B0
 			>;
 		};
 
@@ -861,7 +878,7 @@
 &tsc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_tsc>;
-	xnur-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+	/* xnur-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>; */
 	measure-delay-time = <0xffff>;
 	pre-charge-time = <0xfff>;
 	status = "disabled";
