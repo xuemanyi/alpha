@@ -212,6 +212,16 @@
 		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
+
+	beep {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible= "atkalpha-beep";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_beep>;
+		beep-gpio = <&gpio5 1 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
 };
 
 &cpu0 {
