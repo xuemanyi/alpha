@@ -4,7 +4,6 @@
 #include <linux/ide.h>
 #include <linux/module.h>   // module_init, module_exit, MODULE_LICENSE
 #include <linux/init.h>     // __init, __exit
-#include <linux/module.h>
 #include <linux/errno.h>
 #include <linux/gpio.h>
 #include <linux/fs.h>       // file_operations, register_chrdev
@@ -14,6 +13,7 @@
 #include <linux/device.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
+#include <linux/of_gpio.h>
 
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
