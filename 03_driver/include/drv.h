@@ -14,6 +14,7 @@
 #include <linux/of.h>
 #include <linux/of_address.h>
 #include <linux/of_gpio.h>
+#include <linux/semaphore.h>
 
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
