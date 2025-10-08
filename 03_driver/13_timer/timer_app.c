@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
         printf("input CMD:");
         ret = scanf("%d", &cmd);
         if (ret != 1) {
-            gets(str);
+            fgets(str, sizeof(str), stdin);
         }
 
         if (cmd == 1) {
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
             printf("input timer period:");
             ret = scanf("%d", &arg);
             if (ret != 1) {
-                gets(str);
+                fgets(str, sizeof(str), stdin);
             }
         }
 
