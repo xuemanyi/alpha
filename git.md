@@ -53,3 +53,44 @@
 | `hotfix/` | 紧急生产环境修复 | `hotfix/security-patch` |
 | `release/` | 版本发布准备 | `release/v2.1.0` |
 | `experiment/` | 实验性功能 | `experiment/new-ui` |
+
+## git push failed
+```
+git push origin local_develop 
+fatal: 无法访问 'https://github.com/sucre-gs/alpha.git/'：Failed to connect to github.com port 443 after 135346 ms: Couldn't connect to server
+```
+1. 问题
+   浏览器可以直接访问远程仓库，但是`push`失败  
+   如果浏览器能访问`GitHub`但`Git`不能，多半是`Git`没走代理
+2. 测试网络连接
+    - **ping github.com**
+    - **curl -v https://github.com**
+    ``` 
+    ping github.com 
+    PING github.com (20.205.243.166) 56(84) bytes of data. 
+    64 bytes from 20.205.243.166: icmp_seq=1 ttl=105 time=192 ms 
+    64 bytes from 20.205.243.166: icmp_seq=2 ttl=105 time=191 ms 
+    ^C 
+    --- github.com ping statistics --- 
+    2 packets transmitted, 2 received, 0% packet loss, time 1000ms 
+    rtt min/avg/max/mdev = 191.344/191.776/192.209/0.432 ms 
+    sucre@xiaomi:~/01_alpha/03_driver/15_block_IO$ curl -v https://github.com 
+    * Host github.com:443 was resolved. 
+    * IPv6: (none) 
+    * IPv4: 20.205.243.166 
+    * Trying 20.205.243.166:443...
+    ```
+    问题本质：
+    Git 和 curl 访问 GitHub 都需要通过 HTTPS（TCP 443 端口），而浏览器能访问 GitHub，说明浏览器 走了代理/VPN
+    Git 目前没有走代理通道，所以连接不上
+3. 解决方法  
+    `git config --global http.proxy http://127.0.0.1:7897`  
+    `git config --global https.proxy http://127.0.0.1:7897`  
+    端口使用 clash 默认端口  
+4. 验证
+    ```
+    git ls-remote https://github.com/sucre-gs/alpha.git
+    1f8d9a5ba0b4751b2ec8a333dc7cc6e976963ad2        HEAD
+    1f8d9a5ba0b4751b2ec8a333dc7cc6e976963ad2        refs/heads/master
+    ```
+    能够列出分支，代表可以成功连接网络
