@@ -59,7 +59,7 @@
 git push origin local_develop 
 fatal: 无法访问 'https://github.com/sucre-gs/alpha.git/'：Failed to connect to github.com port 443 after 135346 ms: Couldn't connect to server
 ```
-1. 问题
+1. 问题  
    浏览器可以直接访问远程仓库，但是`push`失败  
    如果浏览器能访问`GitHub`但`Git`不能，多半是`Git`没走代理
 2. 测试网络连接
