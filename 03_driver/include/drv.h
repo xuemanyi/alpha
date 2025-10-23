@@ -20,6 +20,7 @@
 #include <linux/of_irq.h>
 #include <linux/wait.h>
 #include <linux/poll.h>
+#include <linux/fcntl.h>
 
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
